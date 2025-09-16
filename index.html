@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calm Bubbles 🌸</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to top right, #a1c4fd, #c2e9fb);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle at top left, rgba(255,255,255,0.9), rgba(255,255,255,0.2));
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+    }
+
+    .bubble:active {
+      transform: scale(0.8);
+    }
+
+    #scoreboard {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 18px;
+      color: #333;
+      backdrop-filter: blur(8px);
+      font-weight: bold;
+    }
+
+    #message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 32px;
+      color: white;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 2s ease-out;
+      text-shadow: 0 0 15px rgba(255,255,255,0.9);
+    }
+
+    /* Bubble Glow */
+    @keyframes popGlow {
+      from { box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+      to { box-shadow: 0 0 50px rgba(255,255,255,1); }
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="scoreboard">Score: 0</div>
+    <div id="message">Relax & Enjoy 🌸</div>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bg-music" loop autoplay>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- Pop Sound -->
+  <audio id="pop-sound">
+    <source src="https://www.fesliyanstudios.com/play-mp3/387" type="audio/mp3">
+  </audio>
+
+  <script>
+    const gameContainer = document.getElementById("game-container");
+    const scoreboard = document.getElementById("scoreboard");
+    const message = document.getElementById("message");
+    const popSound = document.getElementById("pop-sound");
+    let score = 0;
+
+    const affirmations = [
+      "Stay Calm 🌊",
+      "Breathe Deeply 🌬️",
+      "You Are Loved 💖",
+      "Relax & Enjoy 🌸",
+      "Peace Within 🕊️",
+      "Shine Bright ✨"
+    ];
+
+    // Show changing relaxation messages
+    function showMessage() {
+      message.textContent = affirmations[Math.floor(Math.random() * affirmations.length)];
+      message.style.opacity = "1";
+      setTimeout(() => (message.style.opacity = "0"), 4000);
+    }
+    setInterval(showMessage, 7000);
+
+    // Create bubbles
+    function createBubble() {
+      const bubble = document.createElement("div");
+      const size = Math.random() * 60 + 30; // 30-90px
+      bubble.classList.add("bubble");
+      bubble.style.width = `${size}px`;
+      bubble.style.height = `${size}px`;
+
+      // Gradient colors
+      const colors = [
+        "rgba(255, 182, 193, 0.6)", // pink
+        "rgba(173, 216, 230, 0.6)", // light blue
+        "rgba(144, 238, 144, 0.6)", // light green
+        "rgba(221, 160, 221, 0.6)"  // violet
+      ];
+      bubble.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+      // Random position
+      bubble.style.left = Math.random() * (window.innerWidth - size) + "px";
+      bubble.style.top = window.innerHeight + "px"; // start from bottom
+
+      gameContainer.appendChild(bubble);
+
+      // Floating animation (up + slight sideways drift)
+      let drift = (Math.random() - 0.5) * 2; // -1 to 1
+      let rise = setInterval(() => {
+        let top = parseFloat(bubble.style.top);
+        if (top < -100) {
+          bubble.remove();
+          clearInterval(rise);
+        } else {
+          bubble.style.top = top - 2 + "px";
+          bubble.style.left = parseFloat(bubble.style.left) + drift + "px";
+        }
+      }, 20);
+
+      // Pop bubble on click
+      bubble.addEventListener("click", () => {
+        score++;
+        scoreboard.textContent = "Score: " + score;
+        bubble.style.animation = "popGlow 0.3s alternate";
+        bubble.style.transform = "scale(0)";
+        bubble.style.opacity = "0";
+        popSound.currentTime = 0;
+        popSound.play();
+        setTimeout(() => bubble.remove(), 300);
+      });
+    }
+
+    // Generate bubbles every second
+    setInterval(createBubble, 1000);
+  </script>
+</body>
+</html>
